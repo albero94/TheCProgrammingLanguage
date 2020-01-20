@@ -118,8 +118,6 @@ void exercise8(){
     printf("The number of tabs are: %d \n", tabs);
     printf("The number of lines are: %d \n", newLines);
     printf("The number of blanks are: %d \n", blanks);
-
-    // As I am using ctrl+c instead of EOF only the first printf appears
 }
 
 // copy input into output removing multiple blanks
@@ -201,6 +199,7 @@ void exercise12(){
 
 void countOcurrencesOfEachDataType(){
     int nother, nwhite, c, i;
+    nother = nwhite = 0;
     int ndigit[10];
 
     for (i; i<10; i++)
@@ -215,12 +214,11 @@ void countOcurrencesOfEachDataType(){
             ++nother; 
     }
     printf("Digits =");
-    for (i; i<10; i++)
+    for (i=0; i<10; i++)
         printf(" %d", ndigit[i]);
     printf("\n Whites = %d", nwhite);
     printf("\n Others = %d", nother);
     
-    // need to test as I still don't know how to input EOF
 }
 
 // Histogram of length of words\
@@ -254,7 +252,8 @@ void exercise13(){
     }
 
     int j;
-    for(i; i<MAXLENGTH; ++i){
+    for(i=0; i<MAXLENGTH; ++i){
+        printf("%d: ", i);
         for(j=0; j<histogram[i]; ++j){
             printf("|");
         }
@@ -262,7 +261,139 @@ void exercise13(){
     }
 }
 
+// Vertical Histogram
+void exercise13_2(){
+    #define IN 1
+    #define OUT 0
+    #define MAXLENGTH 10
+    #define MAXWORDS 5
+
+    int c, state, wordLength, i;
+    wordLength = i = 0;
+    state = OUT;
+    int histogram[MAXLENGTH];
+
+    for(i; i<MAXLENGTH; ++i)
+        histogram[i] = 0;
+
+
+    while ((c = getchar()) != EOF){
+        if (c == ' ' || c == '\t' || c == '\n'){
+            state = OUT;
+            ++histogram[wordLength];
+            wordLength = 0;
+        }
+        else if (state == IN)
+            ++wordLength;
+        else {
+            state = IN;
+            ++wordLength;
+        }
+    }
+    int max = histogram[0];
+    for(i=0; i<MAXLENGTH; ++i){
+        printf("%d", histogram[i]);
+        if(histogram[i] > max)
+            max = histogram[i]; 
+    }
+    printf("\n");
+
+    int j;
+    for(max; max>0; --max){
+        for(j=0; j<MAXLENGTH; ++j){
+            if(histogram[j] >= max) printf("_");
+            else printf(" ");
+            printf(" ");
+        }
+        printf("\n");
+    }
+    for(j=0; j<MAXLENGTH; ++j){
+        printf("%d ", j);
+    }
+}
+
+// Functions
+int power (int base, int exponent){
+    int result = 1;
+    for (exponent; exponent > 0; --exponent)
+        result *= base;
+    return result;
+}
+
+// Arguments - call by value
+
+// Character arrays
+void longestLine1(){
+    #define MAXLENGTH 255
+    int c, i, currentLength, longestLength;
+    char line[MAXLENGTH];
+    char longestLine[MAXLENGTH];
+    currentLength = longestLength = 0;
+
+    while((c = getchar()) != EOF){
+        if(c != '\n'){
+            line[currentLength] = c;
+            ++currentLength;
+        }else{
+            line[currentLength] = '\0';
+            if(currentLength > longestLength){
+                longestLength = currentLength;
+                i = 0;
+                while(line[i] != '\0'){
+                    longestLine[i] = line[i];
+                    ++i;
+                }
+                longestLine[i] = line[i];
+            }
+            currentLength = 0;
+        }
+    }
+    printf("The longest sentence is: %s \n", longestLine);
+    printf("The length is: %d", longestLength);
+}
+int getline(char line[], int maxline);
+int copy(char to[], char from[]);
+
+int getline(char s[], int lim){
+    int i, c;
+    for (i=0; i < lim-1 && (c = getchar()) != EOF && c != '\n'; ++i){
+        s[i] = c;
+    }
+    if (c == '\n'){
+        s[i] = c;
+        ++i;
+    }
+    s[i] = '\0';
+    return i;    
+}
+
+int copy(char to[], char from[]){
+    int i = 0;
+    while ((to[i] = from[i]) != '\0')
+        ++i;        
+}
+
+
+void longestLine2(){
+    #define MAXLENGTH 255
+    int c, i, currentLength, longestLength;
+    longestLength = 0;
+    char line[MAXLENGTH];
+    char longestLine[MAXLENGTH];
+    
+    while ((currentLength = getline(line, MAXLENGTH)) > 0){
+        if (currentLength > longestLength){
+            copy(longestLine, line);
+            longestLength = currentLength;
+        }
+    }
+
+    if (longestLength > 0)
+        printf("With length %d the longest sentence is: %s",longestLength, longestLine);
+    
+}
+
 int main (){
-    exercise13();
+    exercise13_2();
     return 0;
 }
